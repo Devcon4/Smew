@@ -32,7 +32,7 @@ namespace SmewApi.Controllers {
             var trackingId = new Guid();
             var ret = _messageBus.FirstAsync<GetMessageResponseEvent>(trackingId);
             var input = new MessageQuery("", AuthorUid);
-            await _messageBus.PublishAsync(new GetMessageRequestEvent(input));
+            await _messageBus.PublishAsync(new GetMessageRequestEvent(input), trackingId);
             return (await ret).Body;
         }
     }
