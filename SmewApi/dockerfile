@@ -1,0 +1,31 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0 as build
+
+ARG SmewApi__Redis__ConnectionString
+ARG SmewApi__Serilog__WriteTo__0__Args__serverUrl
+
+RUN echo "redis: ${SmewApi__Redis__ConnectionString}, seq:${SmewApi__Serilog__WriteTo__0__Args__serverUrl}";
+
+ENV SmewApi__AppInfo__InstanceId=${HOSTNAME}
+ENV SmewApi__Redis__ConnectionString=${SmewApi__Redis__ConnectionString}
+ENV SmewApi__Serilog__WriteTo__0__Args__serverUrl=${SmewApi__Serilog__WriteTo__0__Args__serverUrl}
+
+WORKDIR /app
+
+COPY ./*.csproj .
+RUN dotnet restore
+
+COPY . .
+RUN dotnet publish -c Release -o dist --runtime alpine-x64 --self-contained true /p:PublishTrimmed=true /p:PublishSingleFile=true
+
+FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine
+
+RUN adduser --disabled-password --home /app --gecos '' appuser && chown -R appuser /app
+USER appuser
+
+WORKDIR /app
+
+COPY --from=build /app/dist .
+ENV ASPNETCORE_URLS=http://+:8080
+
+EXPOSE 8080
+ENTRYPOINT [ "./SmewApi", "--urls", "http://0.0.0.0:8080" ]

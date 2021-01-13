@@ -6,26 +6,21 @@ using Microsoft.Extensions.Logging;
 using Smew.Events;
 using Smew.Infrastructure;
 
-namespace Smew.Handlers
-{
+namespace Smew.Handlers {
 
-    public class PostMessageHandler : EventHandler<PostMessageEvent>
-    {
+    public class PostMessageHandler : EventHandler<PostMessageEvent> {
         private readonly ILogger<PostMessageHandler> _logger;
 
         public IMessageBus _messageBus { get; }
 
-        public PostMessageHandler(ILogger<PostMessageHandler> logger, IMessageBus messageBus) {
+        public PostMessageHandler (ILogger<PostMessageHandler> logger, IMessageBus messageBus) {
             _logger = logger;
             _messageBus = messageBus;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            obs.Subscribe(e => {
-                _logger.LogInformation("Message received: " + e.EventBody.Body.Content);
-            });
-            await _messageBus.SubscribeAsync<PostMessageEvent>(sub);
+        protected override async Task ExecuteAsync (CancellationToken stoppingToken) {
+            obs.Subscribe (e => { });
+            await _messageBus.SubscribeAsync<PostMessageEvent> (sub);
         }
     }
 }
